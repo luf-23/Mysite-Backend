@@ -64,4 +64,11 @@ public class UserServiceImpl implements UserService {
         return Result.success();
     }
 
+    @Override
+    public Result getInfoByName(String username) {
+        if (username == null) return Result.error("用户名不能为空");
+        User user = userMapper.selectByUsername(username);
+        return Result.success(user);
+    }
+
 }

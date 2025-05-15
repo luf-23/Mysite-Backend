@@ -39,4 +39,8 @@ public class UserController {
         return userService.update(user);
     }
 
+    @GetMapping("getInfoByName")
+    public Result getInfoByName(@RequestParam @Pattern(regexp = "^\\S{5,16}$") String username){
+        return userService.getInfoByName(username);
+    }
 }

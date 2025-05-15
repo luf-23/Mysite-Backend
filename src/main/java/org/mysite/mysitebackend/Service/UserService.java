@@ -1,5 +1,6 @@
 package org.mysite.mysitebackend.Service;
 
+import jakarta.validation.constraints.Pattern;
 import org.mysite.mysitebackend.entity.Result;
 import org.mysite.mysitebackend.entity.User;
 
@@ -11,4 +12,6 @@ public interface UserService {
     Result getInfo();
 
     Result update(User user);
+
+    Result getInfoByName(String username);
 }
