@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class CommunityServiceImpl implements CommunityService {
@@ -33,5 +34,13 @@ public class CommunityServiceImpl implements CommunityService {
         Integer authorId = categoryMapper.selectUserIdByCategoryId(categoryId);
         User user = userMapper.selectById(authorId);
         return Result.success(user.getUsername());
+    }
+
+    @Override
+    public Result selectedList(Map<String, Object> params) {
+        String title = (String) params.get("title");
+        String content = (String) params.get("content");
+        List<Article> articleList = articleMapper.selectArticlesByTitleAndContent(title, content);
+        return Result.success(articleList);
     }
 }

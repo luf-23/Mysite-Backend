@@ -45,4 +45,7 @@ public interface ArticleMapper {
 
     @Select("SELECT * FROM article where status='published'")
     List<Article> selectArticles();
+
+    @Select("SELECT * FROM article where status='published' and title like concat('%', #{title}, '%') and content like concat('%', #{content}, '%')")
+    List<Article> selectArticlesByTitleAndContent(String title, String content);
 }
