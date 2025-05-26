@@ -37,7 +37,7 @@ public interface ArticleMapper {
     @Insert("insert into article (category_id, title, content, status, create_time, update_time) values (#{categoryId},#{title},#{content},#{status},now(),now())")
     void add(Article article);
 
-    @Update("update article set status = 'published' where article_id = #{articleId}")
+    @Update("update article set status = 'pending' where article_id = #{articleId}")
     void publishById(Integer articleId);
 
     @Update("update article set title = #{title}, content = #{content}, status = #{status}, update_time = now() where article_id = #{articleId}")

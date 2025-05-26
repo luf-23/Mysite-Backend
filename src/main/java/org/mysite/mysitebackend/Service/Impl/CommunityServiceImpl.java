@@ -32,6 +32,7 @@ public class CommunityServiceImpl implements CommunityService {
     public Result getAuthor(Integer categoryId) {
         if (categoryId == null) return Result.error("文章分类id不能为空");
         Integer authorId = categoryMapper.selectUserIdByCategoryId(categoryId);
+        if (authorId == null) return Result.error("作者不存在");
         User user = userMapper.selectById(authorId);
         return Result.success(user.getUsername());
     }
