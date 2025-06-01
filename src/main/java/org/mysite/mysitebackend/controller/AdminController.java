@@ -23,54 +23,56 @@ public class AdminController {
     private ArticleMapper articleMapper;
     @GetMapping("/pendingList")
     public Result<List<Article>> getPendingList() {
-        Map<String, Object> claims = ThreadLocalUtil.get();
-        String username = (String) claims.get("username");
-        if (!username.equals("admin")) return Result.error("权限不足");
+        if (!isAdmin()) return Result.error("权限不足");
         return adminService.getPendingList();
     }
 
     @GetMapping("/publishedList")
     public Result<List<Article>> getPublishedList(){
-        Map<String, Object> claims = ThreadLocalUtil.get();
-        String username = (String) claims.get("username");
-        if (!username.equals("admin")) return Result.error("权限不足");
+        if (!isAdmin()) return Result.error("权限不足");
         return adminService.getPublishedList();
     }
 
     @GetMapping("/articleDetail")
     public Result<Article> getArticleDetail(Integer articleId){
-        Map<String, Object> claims = ThreadLocalUtil.get();
-        String username = (String) claims.get("username");
-        if (!username.equals("admin")) return Result.error("权限不足");
+        if (!isAdmin()) return Result.error("权限不足");
         if (articleMapper.selectById(articleId) == null) return Result.error("文章不存在");
         return adminService.getArticleDetail(articleId);
     }
 
     @PostMapping("/accept")
     public Result accept(Integer articleId){
-        Map<String, Object> claims = ThreadLocalUtil.get();
-        String username = (String) claims.get("username");
-        if (!username.equals("admin")) return Result.error("权限不足");
+        if (!isAdmin()) return Result.error("权限不足");
         if (articleMapper.selectById(articleId) == null) return Result.error("文章不存在");
         return adminService.accept(articleId);
     }
 
     @PostMapping("/reject")
     public Result reject(Integer articleId){
-        Map<String, Object> claims = ThreadLocalUtil.get();
-        String username = (String) claims.get("username");
-        if (!username.equals("admin")) return Result.error("权限不足");
+        if (!isAdmin()) return Result.error("权限不足");
         if (articleMapper.selectById(articleId) == null) return Result.error("文章不存在");
         return adminService.reject(articleId);
     }
 
     @PostMapping("/drop")
     public Result drop(Integer articleId){
-        Map<String, Object> claims = ThreadLocalUtil.get();
-        String username = (String) claims.get("username");
-        if (!username.equals("admin")) return Result.error("权限不足");
+        if (!isAdmin()) return Result.error("权限不足");
         if (articleMapper.selectById(articleId) == null) return Result.error("文章不存在");
         return adminService.drop(articleId);
     }
+
+    @GetMapping("/users")
+    public Result UserList(){
+        if (!isAdmin()) return Result.error("权限不足");
+        return adminService.getUserList();
+    }
+
+    private boolean isAdmin(){
+        Map<String, Object> claims = ThreadLocalUtil.get();
+        String username = (String) claims.get("username");
+        if (!username.equals("admin")) return false;
+        return true;
+    }
+
 
 }

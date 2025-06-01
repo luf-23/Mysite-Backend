@@ -17,4 +17,6 @@ public interface AdminService {
     Result drop(Integer articleId);
 
     Result<Article> getArticleDetail(Integer articleId);
+
+    Result getUserList();
 }

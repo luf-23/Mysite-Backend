@@ -50,4 +50,9 @@ public class AdminServiceImpl implements AdminService {
     public Result<Article> getArticleDetail(Integer articleId) {
         return Result.success(articleMapper.selectById(articleId));
     }
+
+    @Override
+    public Result getUserList() {
+        return Result.success(adminMapper.selectAllUser());
+    }
 }
