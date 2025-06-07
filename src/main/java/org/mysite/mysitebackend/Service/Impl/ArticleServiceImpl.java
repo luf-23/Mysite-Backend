@@ -117,6 +117,16 @@ public class ArticleServiceImpl implements ArticleService {
         return Result.success();
     }
 
+    @Override
+    public Result updateCoverImage(Integer articleId, String coverImage, Integer categoryId) {
+        if (articleId == null) return Result.error("文章id不能为空");
+        if (coverImage == null) return Result.error("文章封面不能为空");
+        if (!isok(categoryId)) return Result.error("权限不足");
+        articleMapper.uploadCoverImage(articleId, coverImage);
+        return Result.success();
+    }
+
+
     Boolean isok(Integer categoryId){
         Map<String, Object> claims = ThreadLocalUtil.get();
         List<Category> categories = new ArrayList<>(categoryMapper.selectByUserId((Integer) claims.get("id")));

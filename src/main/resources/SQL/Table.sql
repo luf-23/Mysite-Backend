@@ -22,6 +22,9 @@ CREATE TABLE user (
     update_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 AUTO_INCREMENT=100001;
 
+ALTER TABLE user MODIFY background_image  VARCHAR(512) comment '背景图URL' DEFAULT 'https://luf-23.oss-cn-wuhan-lr.aliyuncs.com/background/default.jpg';
+ALTER TABLE user MODIFY avatar_image VARCHAR(512) comment '头像URL' DEFAULT 'https://luf-23.oss-cn-wuhan-lr.aliyuncs.com/avatar/default.png';
+
 -- 文章分类表
 CREATE TABLE category(
     category_id INT AUTO_INCREMENT PRIMARY KEY COMMENT '分类ID',
@@ -47,17 +50,8 @@ CREATE TABLE article(
 
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 AUTO_INCREMENT=100001;
 
--- 头像表
-CREATE TABLE avatar(
-    avatar_id INT AUTO_INCREMENT PRIMARY KEY COMMENT '头像ID',
-    url varchar(50) NOT NULL COMMENT '头像URL'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 AUTO_INCREMENT=100001;
+ALTER TABLE article ADD COLUMN cover_image VARCHAR(512) comment '文章封面图URL' DEFAULT 'https://luf-23.oss-cn-wuhan-lr.aliyuncs.com/article/background/default.jpg';
 
--- 背景表
-CREATE TABLE background(
-    background_id INT AUTO_INCREMENT PRIMARY KEY COMMENT '背景图ID',
-    url varchar(50) NOT NULL COMMENT '背景图URL'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 AUTO_INCREMENT=100001;
 
 
 -- 评论表

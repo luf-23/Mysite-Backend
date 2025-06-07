@@ -13,4 +13,5 @@ public class Article {
     private String status;
     private LocalDateTime createTime;
     private LocalDateTime updateTime;
+    private String coverImage;
 }

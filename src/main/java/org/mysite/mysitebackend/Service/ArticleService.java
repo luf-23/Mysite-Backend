@@ -26,4 +26,6 @@ public interface ArticleService {
     Result publish(Integer articleId, Integer categoryId);
 
     Result update(Article article);
+
+    Result updateCoverImage(Integer articleId, String coverImage,Integer categoryId);
 }

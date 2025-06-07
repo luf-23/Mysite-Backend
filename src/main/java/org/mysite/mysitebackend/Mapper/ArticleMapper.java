@@ -48,4 +48,7 @@ public interface ArticleMapper {
 
     @Select("SELECT * FROM article where status='published' and title like concat('%', #{title}, '%') and content like concat('%', #{content}, '%')")
     List<Article> selectArticlesByTitleAndContent(String title, String content);
+
+    @Update("update article set cover_image = #{coverImage} where article_id = #{articleId}")
+    void uploadCoverImage(Integer articleId, String coverImage);
 }

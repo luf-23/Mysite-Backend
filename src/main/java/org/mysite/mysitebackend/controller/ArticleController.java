@@ -64,4 +64,10 @@ public class ArticleController {
         return ArticleService.update(article);
     }
 
+    @PostMapping("/updateCoverImage")
+    public Result updateCoverImage(@RequestParam Integer articleId,@RequestParam String coverImageUrl,@RequestParam Integer categoryId){
+        return ArticleService.updateCoverImage(articleId,coverImageUrl,categoryId);
+    }
+
+
 }
