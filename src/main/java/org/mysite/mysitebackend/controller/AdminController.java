@@ -2,14 +2,12 @@ package org.mysite.mysitebackend.controller;
 
 import org.mysite.mysitebackend.Mapper.ArticleMapper;
 import org.mysite.mysitebackend.Service.AdminService;
+import org.mysite.mysitebackend.entity.Announcement;
 import org.mysite.mysitebackend.entity.Article;
 import org.mysite.mysitebackend.entity.Result;
 import org.mysite.mysitebackend.utils.ThreadLocalUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
@@ -67,12 +65,30 @@ public class AdminController {
         return adminService.getUserList();
     }
 
-    private boolean isAdmin(){
+    @GetMapping("/announcement")
+    public Result<List<Announcement>> getAnnouncement(){
+        //if (!isAdmin()) return Result.error("权限不足");
+        return adminService.getAnnouncement();
+    }
+
+    @PostMapping("/deleteAnnouncement")
+    public Result deleteAnnouncement(Integer id){
+        if (!isAdmin()) return Result.error("权限不足");
+        if (id == null) return Result.error("参数错误");
+        return adminService.deleteAnnouncement(id);
+    }
+
+    @PostMapping("/addAnnouncement")
+    public Result addAnnouncement(@RequestBody Announcement announcement){
+        if (!isAdmin()) return Result.error("权限不足");
+        if (announcement == null|| announcement.getContent() == null || announcement.getTitle() == null || announcement.getType() == null) return Result.error("参数错误");
+        return adminService.addAnnouncement(announcement);
+    }
+
+    private boolean isAdmin() {
         Map<String, Object> claims = ThreadLocalUtil.get();
         String username = (String) claims.get("username");
         if (!username.equals("admin")) return false;
         return true;
     }
-
-
 }

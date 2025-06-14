@@ -1,8 +1,10 @@
 package org.mysite.mysitebackend.Service.Impl;
 
 import org.mysite.mysitebackend.Mapper.AdminMapper;
+import org.mysite.mysitebackend.Mapper.AnnouncementMapper;
 import org.mysite.mysitebackend.Mapper.ArticleMapper;
 import org.mysite.mysitebackend.Service.AdminService;
+import org.mysite.mysitebackend.entity.Announcement;
 import org.mysite.mysitebackend.entity.Article;
 import org.mysite.mysitebackend.entity.Result;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +20,8 @@ public class AdminServiceImpl implements AdminService {
     private AdminMapper adminMapper;
     @Autowired
     private ArticleMapper articleMapper;
+    @Autowired
+    private AnnouncementMapper announcementMapper;
     @Override
     public Result<List<Article>> getPendingList() {
         return Result.success(adminMapper.selectAllPendingArticles());
@@ -54,5 +58,22 @@ public class AdminServiceImpl implements AdminService {
     @Override
     public Result getUserList() {
         return Result.success(adminMapper.selectAllUser());
+    }
+
+    @Override
+    public Result<List<Announcement>> getAnnouncement() {
+        return Result.success(announcementMapper.selectAll());
+    }
+
+    @Override
+    public Result deleteAnnouncement(Integer id) {
+        announcementMapper.deleteById(id);
+        return Result.success();
+    }
+
+    @Override
+    public Result addAnnouncement(Announcement announcement) {
+        announcementMapper.add(announcement);
+        return Result.success();
     }
 }

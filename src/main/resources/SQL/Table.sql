@@ -65,3 +65,12 @@ CREATE TABLE comment(
     FOREIGN KEY (article_id) REFERENCES article(article_id) ON DELETE CASCADE,
     FOREIGN KEY (user_id) REFERENCES user(user_id) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 AUTO_INCREMENT=100001;
+
+-- 公告表
+CREATE TABLE announcement(
+    id INT AUTO_INCREMENT PRIMARY KEY COMMENT '公告ID',
+    title VARCHAR(50) NOT NULL COMMENT '标题',
+    content TEXT NOT NULL COMMENT '内容',
+    date TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '发布时间',
+    type ENUM('success', 'warning', 'danger', 'info') DEFAULT 'success' COMMENT '公告类型'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 AUTO_INCREMENT=100001;

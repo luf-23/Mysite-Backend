@@ -1,5 +1,6 @@
 package org.mysite.mysitebackend.Service;
 
+import org.mysite.mysitebackend.entity.Announcement;
 import org.mysite.mysitebackend.entity.Article;
 import org.mysite.mysitebackend.entity.Result;
 
@@ -19,4 +20,10 @@ public interface AdminService {
     Result<Article> getArticleDetail(Integer articleId);
 
     Result getUserList();
+
+    Result<List<Announcement>> getAnnouncement();
+
+    Result deleteAnnouncement(Integer id);
+
+    Result addAnnouncement(Announcement announcement);
 }
