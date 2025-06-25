@@ -19,6 +19,7 @@ public class AiConfig {
         return new RestTemplate();
     }
 
+
     @Bean
     public WebClient aiWebClient(WebClient.Builder builder) {
         return builder
