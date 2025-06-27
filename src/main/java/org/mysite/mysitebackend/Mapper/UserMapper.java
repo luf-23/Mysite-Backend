@@ -22,4 +22,7 @@ public interface UserMapper {
 
     @Update("update user set last_login=now() where user_id=#{userId}")
     void updateLoginTime(Integer userId);
+
+    @Update("update user set last_login_ip=#{ip},update_time=update_time where user_id= #{userId}")
+    void updateLoginIp(Integer userId,String ip);
 }

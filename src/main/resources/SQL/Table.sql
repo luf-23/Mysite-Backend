@@ -24,6 +24,7 @@ CREATE TABLE user (
 
 ALTER TABLE user MODIFY background_image  VARCHAR(512) comment '背景图URL' DEFAULT 'https://luf-23.oss-cn-wuhan-lr.aliyuncs.com/background/default.jpg';
 ALTER TABLE user MODIFY avatar_image VARCHAR(512) comment '头像URL' DEFAULT 'https://luf-23.oss-cn-wuhan-lr.aliyuncs.com/avatar/default.png';
+ALTER TABLE user MODIFY update_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '更新时间';
 
 -- 文章分类表
 CREATE TABLE category(

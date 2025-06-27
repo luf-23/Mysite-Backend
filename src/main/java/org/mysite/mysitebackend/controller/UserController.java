@@ -2,11 +2,9 @@ package org.mysite.mysitebackend.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.constraints.Pattern;
-import lombok.Data;
 import org.mysite.mysitebackend.Service.UserService;
 import org.mysite.mysitebackend.entity.Result;
 import org.mysite.mysitebackend.entity.User;
-import org.mysite.mysitebackend.utils.ThreadLocalUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -21,9 +19,9 @@ public class UserController {
     private UserService userService;
 
     @PostMapping("/login")
-    public Result login(@RequestParam @Pattern(regexp = "^\\S{5,16}$") String username,@RequestParam @Pattern(regexp = "^\\S{5,16}$") String password){
+    public Result login(@RequestParam @Pattern(regexp = "^\\S{5,16}$") String username,@RequestParam @Pattern(regexp = "^\\S{5,16}$") String password,HttpServletRequest request){
         System.out.println("login"+username+password);
-        return userService.login(username, password);
+        return userService.login(username, password,request);
     }
     @PostMapping("/register")
     public Result register(@RequestParam @Pattern(regexp = "^\\S{5,16}$") String username,@RequestParam @Pattern(regexp = "^\\S{5,16}$") String password) {
