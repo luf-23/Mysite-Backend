@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Map;
 
 @RestController
 @RequestMapping("/user")
@@ -20,7 +19,6 @@ public class UserController {
 
     @PostMapping("/login")
     public Result login(@RequestParam @Pattern(regexp = "^\\S{5,16}$") String username,@RequestParam @Pattern(regexp = "^\\S{5,16}$") String password,HttpServletRequest request){
-        System.out.println("login"+username+password);
         return userService.login(username, password,request);
     }
     @PostMapping("/register")

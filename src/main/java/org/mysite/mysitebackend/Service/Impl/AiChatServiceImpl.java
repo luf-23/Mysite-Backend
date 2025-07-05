@@ -4,15 +4,21 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.mysite.mysitebackend.Service.AiChatService;
 import org.mysite.mysitebackend.entity.AIRequest;
+import org.mysite.mysitebackend.utils.ThreadLocalUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StreamUtils;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import reactor.core.publisher.Flux;
 
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,16 +33,22 @@ public class AiChatServiceImpl implements AiChatService {
     private String API_KEY;
     @Value("${ai.url}")
     private String API_URL;
+    @Value("${ai.character.type1}")
+    private String CHARACTER_PATH;
+    private String CHARACTER;
+
     //流式
     private final WebClient webClient;
-    private final ObjectMapper objectMapper;
     //普通
     private final RestTemplate restTemplate;
 
-    public AiChatServiceImpl(RestTemplate restTemplate,WebClient aiWebClient, ObjectMapper objectMapper) {
+    @Autowired
+    private ResourceLoader resourceLoader;
+
+
+    public AiChatServiceImpl(RestTemplate restTemplate,WebClient aiWebClient) {
         this.restTemplate = restTemplate;
         this.webClient = aiWebClient;
-        this.objectMapper = objectMapper;
     }
 
     @Override
@@ -92,6 +104,20 @@ public class AiChatServiceImpl implements AiChatService {
     @Override
     public SseEmitter handleStreamRequest(AIRequest request) {
         SseEmitter emitter = new SseEmitter(180_000L); // 3分钟超时
+        //获取角色
+        try {
+            Resource resource = resourceLoader.getResource(CHARACTER_PATH); // 加载资源
+            if (resource.exists()) {
+                // 读取文件内容并赋值给 CHARACTER
+                CHARACTER = StreamUtils.copyToString(resource.getInputStream(), StandardCharsets.UTF_8);
+            } else {
+                throw new RuntimeException("文件不存在: " + CHARACTER_PATH);
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("读取文件失败: " + CHARACTER_PATH, e);
+        }
+        //System.out.println(CHARACTER);
+        if (isAdmin()) request.getMessages().addFirst(new AIRequest.Message("system", CHARACTER));
 
         // 构建AI请求体
         Map<String, Object> requestBody = Map.of(
@@ -125,4 +151,10 @@ public class AiChatServiceImpl implements AiChatService {
         }
     }
 
+    private boolean isAdmin() {
+        Map<String, Object> claims = ThreadLocalUtil.get();
+        String username = (String) claims.get("username");
+        if (!username.equals("admin")) return false;
+        return true;
+    }
 }

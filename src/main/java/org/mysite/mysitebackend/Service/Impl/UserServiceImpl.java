@@ -5,6 +5,7 @@ import org.mysite.mysitebackend.Mapper.UserMapper;
 import org.mysite.mysitebackend.Service.UserService;
 import org.mysite.mysitebackend.entity.Result;
 import org.mysite.mysitebackend.entity.User;
+import org.mysite.mysitebackend.utils.IpLocationUtil;
 import org.mysite.mysitebackend.utils.JwtUtil;
 import org.mysite.mysitebackend.utils.Md5Util;
 import org.mysite.mysitebackend.utils.ThreadLocalUtil;
@@ -18,6 +19,8 @@ import java.util.Map;
 public class UserServiceImpl implements UserService {
     @Autowired
     private UserMapper userMapper;
+    @Autowired
+    private IpLocationUtil ipLocationUtil;
 
     @Override
     public Result login(String username, String password, HttpServletRequest request) {
@@ -31,7 +34,7 @@ public class UserServiceImpl implements UserService {
         String token = JwtUtil.genToken(claims);
         System.out.println("LoginInfo:"+user);
         userMapper.updateLoginTime(user.getUserId());
-        userMapper.updateLoginIp(user.getUserId(),getClientIP(request));
+        userMapper.updateLoginIp(user.getUserId(), ipLocationUtil.getAddressFromLocation(ipLocationUtil.getLocationFromIp(ipLocationUtil.getClientIP( request))));
         return Result.success(token);
     }
 
@@ -73,17 +76,5 @@ public class UserServiceImpl implements UserService {
         return Result.success(user);
     }
 
-    // 获取客户端真实IP的方法
-    private String getClientIP(HttpServletRequest request) {
-        String ip = request.getHeader("X-Forwarded-For");
-        if (ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip)) {
-            ip = request.getRemoteAddr();
-        }
-        // 处理 IPv6 的本地回环地址
-        if ("0:0:0:0:0:0:0:1".equals(ip) || "::1".equals(ip)) {
-            return "127.0.0.1";
-        }
-        return ip;
-    }
 
 }

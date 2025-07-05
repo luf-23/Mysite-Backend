@@ -22,5 +22,10 @@ public class AIRequest {
 
         @NotBlank
         private String content;     // 消息内容
+
+        public Message(String role, String content) {
+            this.role = role;
+            this.content = content;
+        }
     }
 }
