@@ -6,14 +6,19 @@ import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 import org.mysite.mysitebackend.entity.User;
 
+import java.util.List;
+
 @Mapper
 public interface UserMapper {
 
     @Select("select * from user where username = #{username}")
     User selectByUsername(String username);
 
-    @Insert("insert into user (username, password,nickname) values (#{username}, #{password},'匿名用户')")
-    void add(String username, String password);
+    @Select("select * from user where email = #{email}")
+    User selectByEmail(String email);
+
+    @Insert("insert into user (username, password,nickname,email) values (#{username}, #{password},'匿名用户',#{email})")
+    void add(String username, String password,String email);
 
     @Select("select * from user where user_id=#{id}")
     User selectById(int id);
@@ -25,4 +30,7 @@ public interface UserMapper {
 
     @Update("update user set last_login_ip=#{ip},update_time=update_time where user_id= #{userId}")
     void updateLoginIp(Integer userId,String ip);
+
+    @Select("select email from user")
+    List<String> selectAllEmails();
 }

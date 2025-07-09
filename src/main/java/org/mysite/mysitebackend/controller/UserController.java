@@ -18,12 +18,13 @@ public class UserController {
     private UserService userService;
 
     @PostMapping("/login")
-    public Result login(@RequestParam @Pattern(regexp = "^\\S{5,16}$") String username,@RequestParam @Pattern(regexp = "^\\S{5,16}$") String password,HttpServletRequest request){
-        return userService.login(username, password,request);
+    public Result login(@RequestParam @Pattern(regexp = "(^\\S{5,16}$)|(^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}$)") String usernameOrEmail,@RequestParam @Pattern(regexp = "^\\S{5,16}$") String password,HttpServletRequest request){
+        return userService.login(usernameOrEmail, password,request);
     }
     @PostMapping("/register")
-    public Result register(@RequestParam @Pattern(regexp = "^\\S{5,16}$") String username,@RequestParam @Pattern(regexp = "^\\S{5,16}$") String password) {
-        return userService.register(username, password);
+    public Result register(@RequestParam @Pattern(regexp = "^\\S{5,16}$") String username,@RequestParam @Pattern(regexp = "^\\S{5,16}$") String password,@RequestParam @Pattern(regexp = "^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}$") String email) {
+        if (username.contains("@")) return Result.error("用户名不能包含@");
+        return userService.register(username, password,email);
     }
 
     @GetMapping("/getInfo")
@@ -35,8 +36,19 @@ public class UserController {
         return userService.update(user);
     }
 
-    @GetMapping("getInfoByName")
+    @GetMapping("/getInfoByName")
     public Result getInfoByName(@RequestParam @Pattern(regexp = "^\\S{5,16}$") String username){
         return userService.getInfoByName(username);
     }
+
+    @PostMapping("/captcha")
+    public Result captcha(@RequestParam String email){
+        return userService.captcha(email);
+    }
+
+    @PostMapping("/verify")
+    public Result verifyCaptcha(@RequestParam String email,@RequestParam String captcha){
+        return userService.verifyCaptcha(email, captcha);
+    }
+
 }

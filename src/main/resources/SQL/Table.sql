@@ -22,6 +22,7 @@ CREATE TABLE user (
     update_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 AUTO_INCREMENT=100001;
 
+ALTER TABLE user ADD COLUMN email VARCHAR(255) NULL UNIQUE comment '邮箱';
 ALTER TABLE user MODIFY background_image  VARCHAR(512) comment '背景图URL' DEFAULT 'https://luf-23.oss-cn-wuhan-lr.aliyuncs.com/background/default.jpg';
 ALTER TABLE user MODIFY avatar_image VARCHAR(512) comment '头像URL' DEFAULT 'https://luf-23.oss-cn-wuhan-lr.aliyuncs.com/avatar/default.png';
 ALTER TABLE user MODIFY update_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '更新时间';

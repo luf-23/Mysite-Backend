@@ -5,10 +5,7 @@ import org.mysite.mysitebackend.Mapper.UserMapper;
 import org.mysite.mysitebackend.Service.UserService;
 import org.mysite.mysitebackend.entity.Result;
 import org.mysite.mysitebackend.entity.User;
-import org.mysite.mysitebackend.utils.IpLocationUtil;
-import org.mysite.mysitebackend.utils.JwtUtil;
-import org.mysite.mysitebackend.utils.Md5Util;
-import org.mysite.mysitebackend.utils.ThreadLocalUtil;
+import org.mysite.mysitebackend.utils.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -21,11 +18,16 @@ public class UserServiceImpl implements UserService {
     private UserMapper userMapper;
     @Autowired
     private IpLocationUtil ipLocationUtil;
+    @Autowired
+    private SMTPUtil smtpUtil;
 
     @Override
-    public Result login(String username, String password, HttpServletRequest request) {
-        if (username == null || password == null) return Result.error("用户名或密码不能为空");
-        User user = userMapper.selectByUsername(username);
+    public Result login(String usernameOrEmail, String password, HttpServletRequest request) {
+        if (usernameOrEmail == null || password == null) return Result.error("用户名或密码不能为空");
+        User user;
+        if (usernameOrEmail.matches("^\\S{5,16}$")) user = userMapper.selectByUsername(usernameOrEmail);
+        else if (usernameOrEmail.matches("^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}$")) user = userMapper.selectByEmail(usernameOrEmail);
+        else return Result.error("用户名或邮箱格式错误");
         if (user == null) return Result.error("用户名不存在");
         if (!Md5Util.getMD5String(password).equals(user.getPassword())) return Result.error("密码错误");
         Map<String, Object> claims = new HashMap<>();
@@ -39,11 +41,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Result register(String username, String password) {
+    public Result register(String username, String password,String  email) {
         if (username == null || password == null) return Result.error("用户名或密码不能为空");
         User user = userMapper.selectByUsername(username);
         if (user != null) return Result.error("用户名已存在");
-        userMapper.add(username, Md5Util.getMD5String(password));
+        if (userMapper.selectAllEmails().contains( email)) return Result.error("邮箱已存在");
+        userMapper.add(username, Md5Util.getMD5String(password), email);
         return Result.success();
     }
 
@@ -76,5 +79,16 @@ public class UserServiceImpl implements UserService {
         return Result.success(user);
     }
 
+    @Override
+    public Result captcha(String email) {
+        smtpUtil.sendCaptcha(email);
+        return Result.success();
+    }
+
+    @Override
+    public Result verifyCaptcha(String email, String captcha) {
+        boolean result = smtpUtil.verifyCaptcha(email, captcha);
+        return Result.success(result);
+    }
 
 }
