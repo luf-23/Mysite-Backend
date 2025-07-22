@@ -7,6 +7,7 @@ import org.mysite.mysitebackend.entity.Result;
 import org.mysite.mysitebackend.entity.User;
 import org.mysite.mysitebackend.utils.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -19,7 +20,11 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private IpLocationUtil ipLocationUtil;
     @Autowired
+    private IP2RegionUtil ip2RegionUtil;
+    @Autowired
     private SMTPUtil smtpUtil;
+    @Autowired
+    private StringRedisTemplate redisTemplate;
 
     @Override
     public Result login(String usernameOrEmail, String password, HttpServletRequest request) {
@@ -36,7 +41,7 @@ public class UserServiceImpl implements UserService {
         String token = JwtUtil.genToken(claims);
         System.out.println("LoginInfo:"+user);
         userMapper.updateLoginTime(user.getUserId());
-        userMapper.updateLoginIp(user.getUserId(), ipLocationUtil.getAddressFromLocation(ipLocationUtil.getLocationFromIp(ipLocationUtil.getClientIP( request))));
+        userMapper.updateLoginIp(user.getUserId(),ip2RegionUtil.getDetailedAddress(ipLocationUtil.getClientIP(request)).toString());
         return Result.success(token);
     }
 
@@ -47,6 +52,7 @@ public class UserServiceImpl implements UserService {
         if (user != null) return Result.error("用户名已存在");
         if (userMapper.selectAllEmails().contains( email)) return Result.error("邮箱已存在");
         userMapper.add(username, Md5Util.getMD5String(password), email);
+        redisTemplate.delete("email:captcha:"+email);
         return Result.success();
     }
 

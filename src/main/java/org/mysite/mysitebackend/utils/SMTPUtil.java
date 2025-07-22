@@ -75,9 +75,7 @@ public class SMTPUtil {
         String key = CAPTCHA_KEY_PREFIX + email;
         String savedCaptcha = redisTemplate.opsForValue().get(key);
         if (savedCaptcha != null && savedCaptcha.equals(captcha)) {
-            System.out.println("验证通过");
-            // 验证通过后删除验证码
-            redisTemplate.delete(key);
+            // 不能验证通过后删除验证码，因为如果验证是通过的但是前端调用的register接口是失败的（如邮箱已存在或数据库插入失败），那么验证码就无法再次使用
             return true;
         }
         return false;
