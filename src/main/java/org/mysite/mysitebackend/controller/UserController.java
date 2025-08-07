@@ -27,6 +27,11 @@ public class UserController {
         return userService.register(username, password,email);
     }
 
+    @PostMapping("/reset-password")
+    public Result resetPassword(@RequestParam @Pattern(regexp = "^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}$") String email,@RequestParam @Pattern(regexp = "^\\S{5,16}$") String newPassword){
+        return userService.resetPassword(email, newPassword);
+    }
+
     @GetMapping("/getInfo")
     public Result getInfo(){
         return userService.getInfo();

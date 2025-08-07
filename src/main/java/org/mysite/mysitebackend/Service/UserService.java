@@ -19,4 +19,6 @@ public interface UserService {
     Result captcha(String email);
 
     Result verifyCaptcha(String email, String captcha);
+
+    Result resetPassword(@Pattern(regexp = "^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}$") String email,@Pattern(regexp = "^\\S{5,16}$") String newPassword);
 }

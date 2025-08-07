@@ -97,4 +97,12 @@ public class UserServiceImpl implements UserService {
         return Result.success(result);
     }
 
+    @Override
+    public Result resetPassword(String email,String newPassword) {
+        if (userMapper.selectByEmail( email)== null) return Result.error("该邮箱未注册");
+        userMapper.resetPassword(email,Md5Util.getMD5String(newPassword));
+        redisTemplate.delete("email:captcha:"+email);
+        return Result.success();
+    }
+
 }
