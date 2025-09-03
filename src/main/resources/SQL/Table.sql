@@ -36,9 +36,10 @@ CREATE TABLE category(
     category_description VARCHAR(50) COMMENT '分类描述',
     create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     update_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-    UNIQUE KEY uk_user_category (user_id, category_name),
-    FOREIGN KEY (user_id) REFERENCES user(user_id)
+    FOREIGN KEY (user_id) REFERENCES user(user_id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 AUTO_INCREMENT=100001;
+
+
 
 -- 文章表
 CREATE TABLE article(
@@ -49,12 +50,9 @@ CREATE TABLE article(
     status ENUM('draft', 'published','pending') DEFAULT 'draft' COMMENT '文章状态',
     create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     update_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    cover_image VARCHAR(512) comment '文章封面图URL' DEFAULT 'https://luf-23.oss-cn-wuhan-lr.aliyuncs.com/article/background/default.jpg',
     FOREIGN KEY (category_id) REFERENCES category(category_id) ON DELETE CASCADE
-
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 AUTO_INCREMENT=100001;
-
-ALTER TABLE article ADD COLUMN cover_image VARCHAR(512) comment '文章封面图URL' DEFAULT 'https://luf-23.oss-cn-wuhan-lr.aliyuncs.com/article/background/default.jpg';
-
 
 
 -- 评论表
@@ -69,6 +67,7 @@ CREATE TABLE comment(
     FOREIGN KEY (user_id) REFERENCES user(user_id) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 AUTO_INCREMENT=100001;
 
+
 -- 公告表
 CREATE TABLE announcement(
     id INT AUTO_INCREMENT PRIMARY KEY COMMENT '公告ID',
@@ -76,4 +75,26 @@ CREATE TABLE announcement(
     content TEXT NOT NULL COMMENT '内容',
     date TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '发布时间',
     type ENUM('success', 'warning', 'danger', 'info') DEFAULT 'success' COMMENT '公告类型'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 AUTO_INCREMENT=100001;
+
+
+-- 文章点赞表
+CREATE TABLE article_like_record(
+    id INT AUTO_INCREMENT PRIMARY KEY COMMENT '点赞ID',
+    article_id INT NOT NULL COMMENT '文章ID',
+    user_id INT NULL COMMENT '点赞者ID',
+    create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '点赞时间',
+    FOREIGN KEY (article_id) REFERENCES article(article_id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES user(user_id) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 AUTO_INCREMENT=100001;
+
+
+-- 评论点赞表
+CREATE TABLE comment_like_record(
+    id INT AUTO_INCREMENT PRIMARY KEY COMMENT '点赞ID',
+    comment_id INT NOT NULL COMMENT '评论ID',
+    user_id INT NULL COMMENT '点赞者ID',
+    create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '点赞时间',
+    FOREIGN KEY (comment_id) REFERENCES comment(comment_id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES user(user_id) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 AUTO_INCREMENT=100001;

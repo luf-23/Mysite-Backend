@@ -105,4 +105,11 @@ public class UserServiceImpl implements UserService {
         return Result.success();
     }
 
+    @Override
+    public Result getInfoById(Integer id) {
+        User user = userMapper.selectById(id);
+        if (user==null) return Result.error("用户不存在");
+        return Result.success(user);
+    }
+
 }

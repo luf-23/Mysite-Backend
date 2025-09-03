@@ -45,6 +45,10 @@ public class UserController {
     public Result getInfoByName(@RequestParam @Pattern(regexp = "^\\S{5,16}$") String username){
         return userService.getInfoByName(username);
     }
+    @GetMapping("/getInfoById")
+    public Result getInfoById(@RequestParam Integer id){
+        return userService.getInfoById(id);
+    }
 
     @PostMapping("/captcha")
     public Result captcha(@RequestParam String email){
