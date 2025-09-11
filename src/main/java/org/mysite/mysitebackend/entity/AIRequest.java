@@ -15,10 +15,12 @@ public class AIRequest {
 
     private Double temperature;
 
+    private String character;
+
     @Data
     public static class Message {
         @NotBlank
-        private String role;       // "user" 或 "assistant"
+        private String role;       // "user" 或 "assistant" 或 "system"
 
         @NotBlank
         private String content;     // 消息内容

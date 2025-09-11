@@ -60,4 +60,9 @@ public class UserController {
         return userService.verifyCaptcha(email, captcha);
     }
 
+    //这个为安卓调用的接口，没带token过滤器也不拦截
+    @GetMapping("/getUserInfoByName")
+    public Result getUserInfoByName(@RequestParam @Pattern(regexp = "^\\S{5,16}$") String username){
+        return userService.getUserInfoByName(username);
+    }
 }

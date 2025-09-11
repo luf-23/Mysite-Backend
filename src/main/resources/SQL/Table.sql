@@ -39,6 +39,9 @@ CREATE TABLE category(
     FOREIGN KEY (user_id) REFERENCES user(user_id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 AUTO_INCREMENT=100001;
 
+ALTER TABLE category ADD CONSTRAINT uk_user_name_description UNIQUE (user_id, category_name, category_description);
+
+
 
 
 -- 文章表

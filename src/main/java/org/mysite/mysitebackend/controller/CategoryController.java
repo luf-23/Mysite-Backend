@@ -34,4 +34,16 @@ public class CategoryController {
     public Result update(@RequestBody Category category){
         return categoryService.update(category);
     }
+
+    @PostMapping("/default")
+    public Result setDefault(@RequestParam Integer userId){
+        return categoryService.setDefault(userId);
+    }
+
+    @GetMapping("/defaultId")
+    public Result<Integer> getDefaultId(@RequestParam Integer userId,@RequestParam String categoryName,@RequestParam String categoryDescription){
+        if (categoryName == null || categoryDescription == null || userId == null) return Result.error("参数错误");
+        if (categoryName.equals("") || categoryDescription.equals("")) return Result.error("参数错误");
+        return categoryService.getDefaultId(userId,categoryName,categoryDescription);
+    }
 }

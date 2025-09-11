@@ -48,4 +48,22 @@ public class CategoryServiceImpl implements CategoryService {
         categoryMapper.update(category);
         return Result.success();
     }
+
+    @Override
+    public Result setDefault(Integer userId) {
+        Category category = new Category();
+        category.setUserId(userId);
+        category.setCategoryName("默认分类");
+        category.setCategoryDescription("用于服务安卓项目");
+        categoryMapper.add(category);
+        return Result.success();
+    }
+
+    @Override
+    public Result<Integer> getDefaultId(Integer userId, String categoryName, String categoryDescription) {
+        Integer categoryId = categoryMapper.selectCategoryId(userId, categoryName, categoryDescription);
+        if (categoryId == null) return Result.error("默认分类不存在");
+        return Result.success(categoryId);
+    }
+
 }

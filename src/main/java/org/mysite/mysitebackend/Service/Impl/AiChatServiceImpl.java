@@ -118,6 +118,11 @@ public class AiChatServiceImpl implements AiChatService {
         }
         //System.out.println(CHARACTER);
         if (isAdmin()) request.getMessages().addFirst(new AIRequest.Message("system", CHARACTER));
+        else{
+            if (request.getCharacter() != null && !request.getCharacter().isEmpty()){
+                request.getMessages().addFirst(new AIRequest.Message("system", request.getCharacter()));
+            }
+        }
 
         // 构建AI请求体
         Map<String, Object> requestBody = Map.of(

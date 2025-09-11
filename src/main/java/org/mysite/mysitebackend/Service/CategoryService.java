@@ -13,4 +13,9 @@ public interface CategoryService {
     Result delete(Integer categoryId);
 
     Result update(Category category);
+
+    Result setDefault(Integer userId);
+
+
+    Result<Integer> getDefaultId(Integer userId, String categoryName, String categoryDescription);
 }

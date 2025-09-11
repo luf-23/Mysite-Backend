@@ -16,7 +16,7 @@ public class CorsConfig {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);
-        config.addAllowedOrigin("http://luf.woyioii.cn/");
+        config.addAllowedOrigin("http://luf.woyioii.cn");
         config.addAllowedOrigin("http://localhost:5173/");
         config.addAllowedOrigin("http://43.142.2.253/");
         config.addAllowedOrigin("http://www.luf-23.cn/");

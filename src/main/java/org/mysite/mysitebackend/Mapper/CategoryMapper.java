@@ -23,4 +23,7 @@ public interface CategoryMapper {
 
     @Select("select user_id from category where category_id = #{categoryId}")
     Integer selectUserIdByCategoryId(Integer categoryId);
+
+    @Select("select category_id from category where user_id=#{userId} and category_name=#{categoryName} and category_description=#{categoryDescription}")
+    Integer selectCategoryId(Integer userId, String categoryName,String categoryDescription);
 }
