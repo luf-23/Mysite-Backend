@@ -2,8 +2,11 @@ package org.mysite.mysitebackend.interceptors;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.apache.el.parser.Token;
 import org.mysite.mysitebackend.utils.JwtUtil;
 import org.mysite.mysitebackend.utils.ThreadLocalUtil;
+import org.mysite.mysitebackend.utils.TokenUtil;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
@@ -11,16 +14,27 @@ import java.util.Map;
 // 登录拦截器
 @Component
 public class LoginInterceptor implements HandlerInterceptor {
+
+    @Autowired
+    private TokenUtil tokenUtil;
+
     // 请求处理之前执行
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         String token = request.getHeader("Authorization");
         try {
             Map<String,Object> claims = JwtUtil.parseToken(token);
+            String jti = (String) claims.get("jti");
+            // 查询redis 黑名单是否存在此jti
+            if (tokenUtil.exist(jti)){
+                response.setStatus(401);
+                return false;
+            }
+
             ThreadLocalUtil.set(claims);
             return true;
         }catch(Exception e){
-            System.out.println("token error");
+            //System.out.println("token error");
             response.setStatus(401);
             return false;
         }

@@ -1,6 +1,8 @@
 package org.mysite.mysitebackend.Service.Impl;
 
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.mysite.mysitebackend.Mapper.UserMapper;
 import org.mysite.mysitebackend.Service.UserService;
 import org.mysite.mysitebackend.entity.Result;
@@ -12,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -25,9 +28,11 @@ public class UserServiceImpl implements UserService {
     private SMTPUtil smtpUtil;
     @Autowired
     private StringRedisTemplate redisTemplate;
+    @Autowired
+    private TokenUtil tokenUtil;
 
     @Override
-    public Result login(String usernameOrEmail, String password, HttpServletRequest request) {
+    public Result login(String usernameOrEmail, String password, HttpServletRequest request, HttpServletResponse response) {
         if (usernameOrEmail == null || password == null) return Result.error("用户名或密码不能为空");
         User user;
         if (usernameOrEmail.matches("^\\S{5,16}$")) user = userMapper.selectByUsername(usernameOrEmail);
@@ -35,14 +40,27 @@ public class UserServiceImpl implements UserService {
         else return Result.error("用户名或邮箱格式错误");
         if (user == null) return Result.error("用户名不存在");
         if (!Md5Util.getMD5String(password).equals(user.getPassword())) return Result.error("密码错误");
+
         Map<String, Object> claims = new HashMap<>();
         claims.put("id", user.getUserId());
         claims.put("username", user.getUsername());
-        String token = JwtUtil.genToken(claims);
+        claims.put("jti", UUID.randomUUID().toString().replace("-", ""));
+
+        String accessToken = JwtUtil.genAccessToken(claims);
+        String refreshToken = JwtUtil.genRefreshToken(claims);
+        Cookie refreshTokenCookie = new Cookie("refreshToken", refreshToken);
+        refreshTokenCookie.setHttpOnly(true); // 防止XSS攻击
+        //refreshTokenCookie.setSecure(true); // 仅HTTPS传输（生产环境必须为true）
+        refreshTokenCookie.setPath("/api/user/refreshToken"); // 只发给刷新接口
+        refreshTokenCookie.setPath("/user/refreshToken"); // 只发给刷新接口
+        Integer expire = Integer.valueOf((int) JwtUtil.REFRESH_EXPIRE_TIME/1000);
+        refreshTokenCookie.setMaxAge(expire); // 有效期（与Refresh Token的JWT有效期保持一致）
+        response.addCookie(refreshTokenCookie);
+
         System.out.println("LoginInfo:"+user);
         userMapper.updateLoginTime(user.getUserId());
         userMapper.updateLoginIp(user.getUserId(),ip2RegionUtil.getDetailedAddress(ipLocationUtil.getClientIP(request)).toString());
-        return Result.success(token);
+        return Result.success(accessToken);
     }
 
     @Override
@@ -117,6 +135,45 @@ public class UserServiceImpl implements UserService {
         if (username == null) return Result.error("用户名不能为空");
         User user = userMapper.selectByUsername(username);
         return Result.success(user);
+    }
+
+    @Override
+    public Result refresh(String refreshToken,HttpServletResponse response) {
+        Map<String, Object> claims = new HashMap<>();
+        try {
+            claims = JwtUtil.parseToken(refreshToken);
+        }catch(Exception e){
+            response.setStatus(401);
+            return Result.error("登录过期");
+        }
+        String jti = (String) claims.get("jti");
+
+        //添加黑名单
+        tokenUtil.add(jti);
+
+        String newJti = UUID.randomUUID().toString().replace("-", "");
+        claims.put("jti", newJti);
+
+        String accessToken = JwtUtil.genAccessToken(claims);
+        String newRefreshToken = JwtUtil.genRefreshToken(claims);
+        Cookie refreshTokenCookie = new Cookie("refreshToken", newRefreshToken);
+        refreshTokenCookie.setHttpOnly(true); // 防止XSS攻击
+        //refreshTokenCookie.setSecure(true); // 仅HTTPS传输（生产环境必须为true）
+        refreshTokenCookie.setPath("/api/user/refreshToken"); // 只发给刷新接口
+        refreshTokenCookie.setPath("/user/refreshToken"); // 只发给刷新接口
+        Integer expire = Integer.valueOf((int) JwtUtil.REFRESH_EXPIRE_TIME/1000);
+        refreshTokenCookie.setMaxAge(expire); // 有效期（与Refresh Token的JWT有效期保持一致）
+        response.addCookie(refreshTokenCookie);
+        return Result.success(accessToken);
+    }
+
+    @Override
+    public Result logout(String refreshToken) {
+        Map<String, Object> claims = ThreadLocalUtil.get();
+
+        // jti add to black list
+        tokenUtil.add((String) claims.get("jti"));
+        return Result.success();
     }
 
 }

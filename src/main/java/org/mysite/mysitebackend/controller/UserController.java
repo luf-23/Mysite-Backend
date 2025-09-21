@@ -1,6 +1,7 @@
 package org.mysite.mysitebackend.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.constraints.Pattern;
 import org.mysite.mysitebackend.Service.UserService;
 import org.mysite.mysitebackend.entity.Result;
@@ -18,8 +19,8 @@ public class UserController {
     private UserService userService;
 
     @PostMapping("/login")
-    public Result login(@RequestParam @Pattern(regexp = "(^\\S{5,16}$)|(^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}$)") String usernameOrEmail,@RequestParam @Pattern(regexp = "^\\S{5,16}$") String password,HttpServletRequest request){
-        return userService.login(usernameOrEmail, password,request);
+    public Result login(@RequestParam @Pattern(regexp = "(^\\S{5,16}$)|(^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}$)") String usernameOrEmail, @RequestParam @Pattern(regexp = "^\\S{5,16}$") String password, HttpServletRequest request, HttpServletResponse  response){
+        return userService.login(usernameOrEmail, password,request,response);
     }
     @PostMapping("/register")
     public Result register(@RequestParam @Pattern(regexp = "^\\S{5,16}$") String username,@RequestParam @Pattern(regexp = "^\\S{5,16}$") String password,@RequestParam @Pattern(regexp = "^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}$") String email) {
@@ -64,5 +65,14 @@ public class UserController {
     @GetMapping("/getUserInfoByName")
     public Result getUserInfoByName(@RequestParam @Pattern(regexp = "^\\S{5,16}$") String username){
         return userService.getUserInfoByName(username);
+    }
+
+    @PostMapping("/refreshToken")
+    public Result refreshToken(@CookieValue(name = "refreshToken") String refreshToken,HttpServletResponse response){
+        return userService.refresh(refreshToken,response);
+    }
+    @PostMapping("/logout")
+    public Result logout(@CookieValue(name = "refreshToken") String refreshToken){
+        return userService.logout(refreshToken);
     }
 }

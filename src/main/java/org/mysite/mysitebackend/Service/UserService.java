@@ -1,12 +1,13 @@
 package org.mysite.mysitebackend.Service;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.constraints.Pattern;
 import org.mysite.mysitebackend.entity.Result;
 import org.mysite.mysitebackend.entity.User;
 
 public interface UserService {
-    Result login(String usernameOrEmail, String password, HttpServletRequest request);
+    Result login(String usernameOrEmail, String password, HttpServletRequest request, HttpServletResponse response);
 
     Result register(String username, String password,String email);
 
@@ -25,4 +26,8 @@ public interface UserService {
     Result getInfoById(Integer id);
 
     Result getUserInfoByName(@Pattern(regexp = "^\\S{5,16}$") String username);
+
+    Result refresh(String refreshToken,HttpServletResponse response);
+
+    Result logout(String refreshToken);
 }

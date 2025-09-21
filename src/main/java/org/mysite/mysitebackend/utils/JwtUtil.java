@@ -10,11 +10,22 @@ public class JwtUtil {
 
     private static final String KEY = "this_is_a_key";
 
+    public static final long ACCESS_EXPIRE_TIME = 1000 * 60 * 60;//1h
+    //public static final long ACCESS_EXPIRE_TIME = 1000 * 6;//6s
+    public static final long REFRESH_EXPIRE_TIME = 1000 * 60 * 60 * 24 * 14;//14d
+    //public static final long REFRESH_EXPIRE_TIME = 1000 * 60;//1m
     //接收业务数据,生成token并返回
-    public static String genToken(Map<String, Object> claims) {
+    public static String genAccessToken(Map<String, Object> claims) {
         return JWT.create()
                 .withClaim("claims", claims)
-                .withExpiresAt(new Date(System.currentTimeMillis() + 1000 * 60 * 60 ))
+                .withExpiresAt(new Date(System.currentTimeMillis() + ACCESS_EXPIRE_TIME))
+                .sign(Algorithm.HMAC256(KEY));
+    }
+
+    public static String genRefreshToken(Map<String, Object> claims) {
+        return JWT.create()
+                .withClaim("claims", claims)
+                .withExpiresAt(new Date(System.currentTimeMillis() + REFRESH_EXPIRE_TIME))
                 .sign(Algorithm.HMAC256(KEY));
     }
 
