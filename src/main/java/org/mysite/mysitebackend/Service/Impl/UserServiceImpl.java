@@ -48,13 +48,7 @@ public class UserServiceImpl implements UserService {
 
         String accessToken = JwtUtil.genAccessToken(claims);
         String refreshToken = JwtUtil.genRefreshToken(claims);
-        Cookie refreshTokenCookie = new Cookie("refreshToken", refreshToken);
-        refreshTokenCookie.setHttpOnly(true); // 防止XSS攻击
-        //refreshTokenCookie.setSecure(true); // 仅HTTPS传输（生产环境必须为true）
-        refreshTokenCookie.setPath("/api/user/refreshToken"); // 只发给刷新接口
-        refreshTokenCookie.setPath("/user/refreshToken"); // 只发给刷新接口
-        Integer expire = Integer.valueOf((int) JwtUtil.REFRESH_EXPIRE_TIME/1000);
-        refreshTokenCookie.setMaxAge(expire); // 有效期（与Refresh Token的JWT有效期保持一致）
+        Cookie refreshTokenCookie = genCookie(refreshToken);
         response.addCookie(refreshTokenCookie);
 
         System.out.println("LoginInfo:"+user);
@@ -156,13 +150,7 @@ public class UserServiceImpl implements UserService {
 
         String accessToken = JwtUtil.genAccessToken(claims);
         String newRefreshToken = JwtUtil.genRefreshToken(claims);
-        Cookie refreshTokenCookie = new Cookie("refreshToken", newRefreshToken);
-        refreshTokenCookie.setHttpOnly(true); // 防止XSS攻击
-        //refreshTokenCookie.setSecure(true); // 仅HTTPS传输（生产环境必须为true）
-        refreshTokenCookie.setPath("/api/user/refreshToken"); // 只发给刷新接口
-        refreshTokenCookie.setPath("/user/refreshToken"); // 只发给刷新接口
-        Integer expire = Integer.valueOf((int) JwtUtil.REFRESH_EXPIRE_TIME/1000);
-        refreshTokenCookie.setMaxAge(expire); // 有效期（与Refresh Token的JWT有效期保持一致）
+        Cookie refreshTokenCookie = genCookie(newRefreshToken);
         response.addCookie(refreshTokenCookie);
         return Result.success(accessToken);
     }
@@ -174,6 +162,16 @@ public class UserServiceImpl implements UserService {
         // jti add to black list
         tokenUtil.add((String) claims.get("jti"));
         return Result.success();
+    }
+
+    private Cookie genCookie(String refreshToken){
+        Cookie cookie = new Cookie("refreshToken", refreshToken);
+        cookie.setHttpOnly(true);// 防止XSS攻击
+        cookie.setPath("/api/user/refreshToken");// 只发给刷新接口
+        cookie.setPath("/user/refreshToken");// 只发给刷新接口
+        Integer expire = Integer.valueOf((int) JwtUtil.REFRESH_EXPIRE_TIME/1000);
+        cookie.setMaxAge(expire);// 有效期（与Refresh Token的JWT有效期保持一致）
+        return cookie;
     }
 
 }
