@@ -67,7 +67,7 @@ public class UserController {
         return userService.getUserInfoByName(username);
     }
 
-    @PostMapping("/refreshToken")
+    @GetMapping("/refreshToken")
     public Result refreshToken(@CookieValue(name = "refreshToken") String refreshToken,HttpServletResponse response){
         return userService.refresh(refreshToken,response);
     }

@@ -2,7 +2,6 @@ package org.mysite.mysitebackend.interceptors;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.apache.el.parser.Token;
 import org.mysite.mysitebackend.utils.JwtUtil;
 import org.mysite.mysitebackend.utils.ThreadLocalUtil;
 import org.mysite.mysitebackend.utils.TokenUtil;

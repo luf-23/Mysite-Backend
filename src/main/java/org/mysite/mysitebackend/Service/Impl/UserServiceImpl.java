@@ -48,8 +48,8 @@ public class UserServiceImpl implements UserService {
 
         String accessToken = JwtUtil.genAccessToken(claims);
         String refreshToken = JwtUtil.genRefreshToken(claims);
-        Cookie refreshTokenCookie = genCookie(refreshToken);
-        response.addCookie(refreshTokenCookie);
+
+        response.addHeader("Set-Cookie", cookieHeaderBuilder(refreshToken).toString());
 
         System.out.println("LoginInfo:"+user);
         userMapper.updateLoginTime(user.getUserId());
@@ -150,8 +150,7 @@ public class UserServiceImpl implements UserService {
 
         String accessToken = JwtUtil.genAccessToken(claims);
         String newRefreshToken = JwtUtil.genRefreshToken(claims);
-        Cookie refreshTokenCookie = genCookie(newRefreshToken);
-        response.addCookie(refreshTokenCookie);
+        response.addHeader("Set-Cookie", cookieHeaderBuilder(refreshToken).toString());
         return Result.success(accessToken);
     }
 
@@ -164,14 +163,16 @@ public class UserServiceImpl implements UserService {
         return Result.success();
     }
 
-    private Cookie genCookie(String refreshToken){
-        Cookie cookie = new Cookie("refreshToken", refreshToken);
-        cookie.setHttpOnly(true);// 防止XSS攻击
-        cookie.setPath("/api/user/refreshToken");// 只发给刷新接口
-        cookie.setPath("/user/refreshToken");// 只发给刷新接口
-        Integer expire = Integer.valueOf((int) JwtUtil.REFRESH_EXPIRE_TIME/1000);
-        cookie.setMaxAge(expire);// 有效期（与Refresh Token的JWT有效期保持一致）
-        return cookie;
+    private StringBuilder cookieHeaderBuilder(String refreshToken){
+        Integer expire = Integer.valueOf((int) JwtUtil.REFRESH_EXPIRE_TIME / 1000);
+        StringBuilder cookieBuilder = new StringBuilder();
+        cookieBuilder.append("refreshToken=").append(refreshToken);
+        cookieBuilder.append("; Path=/user/refreshToken");
+        cookieBuilder.append("; HttpOnly");  // 防止XSS攻击
+        cookieBuilder.append("; Max-Age=").append(expire);  // 有效期
+        cookieBuilder.append("; SameSite=Lax");  // 允许跨站
+        cookieBuilder.append("; Secure=false");
+        return cookieBuilder;
     }
 
 }
